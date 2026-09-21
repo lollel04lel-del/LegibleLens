@@ -13,8 +13,8 @@ jobs:
   web-and-extension:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
       - name: Install pnpm
@@ -33,11 +33,11 @@ jobs:
   android-apk:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: 21
@@ -47,6 +47,8 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Build and sync Android app
         run: pnpm android:sync
+      - name: Make Gradle wrapper executable
+        run: chmod +x android/gradlew
       - name: Build debug APK
         working-directory: android
         run: ./gradlew assembleDebug
