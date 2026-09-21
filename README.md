@@ -10,7 +10,7 @@ Class project: select text in images, recognize it with OCR, edit/copy the resul
 4. Package an Android application with Capacitor, the Android SDK, and Gradle. Test on an emulator or Android device and produce an APK.
 5. Publish source to the selected GitHub repository. Release signing and distribution are separate steps.
 
-The web UI and core logic can be shared. Browser capture and Android device integration require platform-specific code. The first browser prototype supports English and Japanese OCR, touch region selection, editable text, copying, and text download. Dictionary lookup, extension packaging, and APK packaging remain to be implemented.
+The web UI and core logic are shared. Browser capture and Android device integration require platform-specific code. The first browser prototype supports English and Japanese OCR, touch region selection, editable text, copying, and text download. GitHub Actions now packages the shared prototype as both an Opera GX extension and an Android debug APK. Dictionary lookup, manga-trained OCR, Japanese-to-Mongolian translation, and full extension capture remain to be implemented.
 
 The target behavior is defined in [the Yomitan-style manga OCR research](docs/yomitan-ocr-research.md). Yomitan itself is a popup dictionary rather than an OCR engine, so LegibleLens must create a selectable OCR text layer first. Android Chrome does not support Yomitan; the web app and APK therefore need their own dictionary popup.
 
@@ -31,9 +31,14 @@ After adding the server, restart/reload the Codex MCP connection for its tools t
 
 The server is configured and independently tested; registration alone does not prove that either editor has loaded it into its active agent session.
 
-## Current machine
+## Repository and generated builds
 
-VS Code, Git, and the bundled Node runtime are available. The earlier Android Studio project and MCP server from the shared conversation were not found in the searched user folders. No Android SDK was found at the default location. GitHub publishing and Android tooling setup remain to be completed when development reaches those stages.
+The source is published at [github.com/lollel04lel-del/LegibleLens](https://github.com/lollel04lel-del/LegibleLens). Open the latest successful [Build LegibleLens artifacts run](https://github.com/lollel04lel-del/LegibleLens/actions/workflows/build.yml) and download:
+
+- `legiblelens-debug-apk`, then unzip it and install `app-debug.apk` on an Android test phone. Android may ask you to allow installation from the browser or file manager used to open it.
+- `legiblelens-opera-extension`, then unzip it, open `opera://extensions`, enable Developer mode, choose **Load unpacked**, and select the extracted folder.
+
+These are test builds. The APK is debug-signed and should not be submitted to an app store. Opera store publication and a release-signed Android build are later release steps.
 
 ## Browser testing
 
@@ -51,7 +56,7 @@ Verification: real English OCR succeeded in the desktop browser over the LAN URL
 - `pnpm android:build` produces a debug APK when Java and the Android SDK are installed.
 - `dist/extension` is the unpacked Manifest V3 extension directory for Opera GX developer mode.
 
-The GitHub Actions workflow in `.github/workflows/build.yml` builds an extension ZIP and Android debug APK on every push to `main`, pull request, or manual run. After publishing the repository, open its Actions run and download the artifacts. This is a debug APK for testing; a public release APK requires a signing key.
+The GitHub Actions workflow in `.github/workflows/build.yml` builds an extension ZIP and Android debug APK on every push to `main`, pull request, or manual run. A public release APK requires a signing key.
 
 The complete implementation order is in [docs/PROJECT_PLAN.md](docs/PROJECT_PLAN.md). The OCR model and Japanese-to-Mongolian evaluation remain the main project; the web app, extension, and APK are shared clients.
 
