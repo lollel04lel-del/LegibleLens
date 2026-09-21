@@ -29,9 +29,10 @@
 
         <div class="upload" id="upload">
           <span class="upload-icon" aria-hidden="true">⌗</span>
-          <h3>Choose a screenshot or manga page</h3>
-          <p>In Opera GX, press the extension button to capture the visible tab automatically.</p>
-          <label class="button primary" for="image">Choose an image</label>
+          <h3>Freeze the phone screen</h3>
+          <p>Start capture, switch to the Japanese screen, then tap Freeze current screen in the notification.</p>
+          <button class="button primary" id="capture-screen">Freeze current screen <span aria-hidden="true">↗</span></button>
+          <label class="button secondary" for="image">Use an image instead</label>
           <input id="image" type="file" accept="image/png,image/jpeg,image/webp">
           <button class="text-button" id="sample">Try Japanese demo ↗</button>
         </div>
@@ -48,7 +49,7 @@
             <button class="text-button" id="crop">Draw scan area</button>
             <button class="text-button" id="reset" hidden>Use full screen</button>
           </div>
-          <p class="hint" id="image-hint">Scan the full screen, or draw around one bubble for better accuracy.</p>
+          <p class="hint" id="image-hint">Scan the frozen screen, or draw around one bubble for better accuracy.</p>
         </div>
 
         <div class="scan-controls">

@@ -17,6 +17,7 @@ let ocrLines = [];
 let selectMode = 'single';
 let overlayVisible = true;
 const selected = new Map();
+const screenCapture = globalThis.Capacitor?.Plugins?.ScreenCapture;
 
 const status = text => { $('status').textContent = text; };
 
@@ -116,6 +117,19 @@ $('sample').onclick = () => {
   c.fillText('文字をタップしてください', 72, 415);
   $('language').value = 'jpn';
   setImage(sample, 'Japanese demo ready. Press Scan text, then tap the green words.');
+};
+
+$('capture-screen').onclick = async () => {
+  if (!screenCapture?.start) {
+    status('Phone screen capture is available in the Android APK only.');
+    return;
+  }
+  try {
+    await screenCapture.start();
+    status('Switch to the Japanese screen, then tap Freeze current screen in the notification.');
+  } catch (error) {
+    status('Screen capture was not started. ' + (error.message || 'Permission was cancelled.'));
+  }
 };
 
 $('crop').onclick = () => {
@@ -247,7 +261,14 @@ function renderOverlay() {
     segment(line.text).forEach((token, tokenIndex) => {
       const span = document.createElement('span');
       span.className = 'ocr-token' + (token.selectable ? '' : ' punctuation');
-      span.textContent = token.text;
+      const result = token.selectable ? dictionaryResult(token.text) : null;
+      span.append(token.text);
+      if (result?.entry?.reading && result.entry.reading !== token.text) {
+        const reading = document.createElement('rt');
+        reading.textContent = result.entry.reading;
+        span.classList.add('has-furigana');
+        span.append(reading);
+      }
       span.dataset.key = lineIndex + ':' + tokenIndex;
       span.dataset.order = lineIndex * 1000 + tokenIndex;
       if (token.selectable) {
@@ -508,3 +529,10 @@ async function loadExtensionCapture() {
 }
 
 loadExtensionCapture();
+
+window.addEventListener('screenCaptured', async event => {
+  const dataUrl = event.detail?.dataUrl;
+  if (!dataUrl) return;
+  await loadImageUrl(dataUrl, 'Screen frozen. OCR is starting...');
+  $('scan').click();
+});
