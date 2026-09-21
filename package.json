@@ -9,7 +9,7 @@
     "build": "node scripts/build.mjs",
     "test": "node scripts/build.mjs && node --test",
     "start": "node scripts/prepare-ocr.mjs && node scripts/build.mjs && node server.mjs",
-    "android:sync": "node scripts/build.mjs && cap sync android",
+    "android:sync": "node scripts/prepare-ocr.mjs && node scripts/build.mjs && cap sync android",
     "android:build": "pnpm android:sync && node scripts/build-android.mjs",
     "extension:build": "node scripts/build.mjs"
   },
