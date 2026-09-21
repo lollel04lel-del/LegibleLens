@@ -3,6 +3,7 @@ name: Build LegibleLens artifacts
 on:
   push:
     branches: [main]
+    tags: ["v*"]
   pull_request:
   workflow_dispatch:
 
@@ -56,3 +57,34 @@ jobs:
         with:
           name: legiblelens-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
+
+  github-release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [web-and-extension, android-apk]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          name: legiblelens-debug-apk
+          path: release/android
+      - uses: actions/download-artifact@v7
+        with:
+          name: legiblelens-opera-extension
+          path: release/extension
+      - name: Give release files clear names
+        run: |
+          mv release/android/app-debug.apk release/LegibleLens-Android-debug.apk
+          mv release/extension/legiblelens-opera-extension.zip release/LegibleLens-Opera-GX-extension.zip
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "LegibleLens $GITHUB_REF_NAME test build" \
+            --notes "Tap LegibleLens-Android-debug.apk on an Android phone to install the test app. Download LegibleLens-Opera-GX-extension.zip on a computer, unzip it, then load the folder from opera://extensions with Developer mode enabled. This is an early OCR prototype; manga-trained OCR and Japanese-to-Mongolian translation are still under development." \
+            --prerelease \
+            release/LegibleLens-Android-debug.apk \
+            release/LegibleLens-Opera-GX-extension.zip

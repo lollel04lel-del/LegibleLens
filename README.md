@@ -33,7 +33,7 @@ The server is configured and independently tested; registration alone does not p
 
 ## Repository and generated builds
 
-The source is published at [github.com/lollel04lel-del/LegibleLens](https://github.com/lollel04lel-del/LegibleLens). Open the latest successful [Build LegibleLens artifacts run](https://github.com/lollel04lel-del/LegibleLens/actions/workflows/build.yml) and download:
+The source is published at [github.com/lollel04lel-del/LegibleLens](https://github.com/lollel04lel-del/LegibleLens). For simple downloads, open [Releases](https://github.com/lollel04lel-del/LegibleLens/releases) and expand **Assets** if GitHub hides the files. Download:
 
 - `legiblelens-debug-apk`, then unzip it and install `app-debug.apk` on an Android test phone. Android may ask you to allow installation from the browser or file manager used to open it.
 - `legiblelens-opera-extension`, then unzip it, open `opera://extensions`, enable Developer mode, choose **Load unpacked**, and select the extracted folder.
