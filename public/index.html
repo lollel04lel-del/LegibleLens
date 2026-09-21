@@ -1,11 +1,118 @@
 <!doctype html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#111c18"><title>LegibleLens · Image to text</title><link rel="stylesheet" href="/style.css"><script defer src="/vendor/tesseract.min.js"></script><script defer src="/app.js"></script></head>
-<body><header><a class="brand" href="/" aria-label="LegibleLens home"><span class="logo">L<span>↗</span></span>LegibleLens</a><span class="tag">EARLY PREVIEW</span></header>
-<main><section class="intro"><p class="eyebrow">LESS TYPING. MORE READING.</p><h1>See text.<br><em>Make it yours.</em></h1><p class="sub">Turn a photo or screenshot into text you can edit, copy, and keep.</p></section>
-<div class="workspace"><section class="card"><div class="card-heading"><span class="step">01</span><h2>Your image</h2><span class="small">JPG · PNG · WEBP</span></div>
-<div class="upload" id="upload"><span class="upload-icon" aria-hidden="true">↥</span><h3>A little clarity starts here.</h3><p>Choose a clear photo, page, or screenshot.</p><label class="button primary" for="image">Choose an image</label><input id="image" type="file" accept="image/png,image/jpeg,image/webp"><button class="text-button" id="sample">Try a sample image ↗</button></div>
-<div id="preview" hidden><div class="canvas-wrap"><canvas id="canvas" aria-label="Selected image preview"></canvas></div><div class="image-controls"><label class="text-button" for="image">Change image</label><button class="text-button" id="crop">Select a region</button><button class="text-button" id="reset" hidden>Use full image</button></div><p class="hint" id="image-hint">Scan the whole image, or select a smaller region.</p></div>
-<div class="scan-controls"><label for="language">Text language<select id="language"><option value="eng">English</option><option value="jpn">Japanese · horizontal</option></select></label><button class="button primary" id="scan" disabled>Recognize text <span aria-hidden="true">↗</span></button><button class="text-button" id="cancel" hidden>Cancel scan</button></div>
-<div class="status-wrap"><p id="status" role="status" aria-live="polite">Choose an image to get started.</p><progress id="progress" value="0" max="1" hidden aria-label="OCR progress"></progress></div></section>
-<section class="card result-card"><div class="card-heading"><span class="step">02</span><h2>Your words</h2><span class="small" id="count">0 characters</span></div><label for="result" class="sr-only">Recognized text</label><textarea id="result" placeholder="Your recognized text will appear here.&#10;&#10;You can make corrections before copying or saving." spellcheck="false"></textarea><div class="result-footer"><span class="hint">Editable, just like a note.</span><div class="actions"><button class="button secondary" id="save" disabled>Save .txt</button><button class="button dark" id="copy" disabled>Copy text</button></div></div></section></div>
-<footer><span><i></i> Your images stay in this browser.</span><span>LegibleLens / A clearer way to read</span></footer><p class="note">First scan loads the language model and may take a moment. Best with clear printed text. Dictionary lookup and the Android app are coming later.</p></main></body></html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111c18">
+  <title>LegibleLens · Japanese screen reader</title>
+  <link rel="stylesheet" href="/style.css">
+  <script defer src="/vendor/tesseract.min.js"></script>
+  <script defer src="/dictionary.js"></script>
+  <script defer src="/app.js"></script>
+</head>
+<body>
+  <header>
+    <a class="brand" href="/" aria-label="LegibleLens home"><span class="logo">L<span>↗</span></span>LegibleLens</a>
+    <span class="tag">JAPANESE READER</span>
+  </header>
+
+  <main>
+    <section class="intro">
+      <p class="eyebrow">OCR + POPUP DICTIONARY</p>
+      <h1>Scan. Tap.<br><em>Understand.</em></h1>
+      <p class="sub">Draw around a manga bubble or scan the full screenshot. Tap one Japanese word—or select several—to see its reading and Mongolian meaning.</p>
+    </section>
+
+    <div class="workspace">
+      <section class="card scanner-card">
+        <div class="card-heading"><span class="step">01</span><h2>Scan the screen</h2><span class="small">JPG · PNG · WEBP</span></div>
+
+        <div class="upload" id="upload">
+          <span class="upload-icon" aria-hidden="true">⌗</span>
+          <h3>Choose a screenshot or manga page</h3>
+          <p>In Opera GX, press the extension button to capture the visible tab automatically.</p>
+          <label class="button primary" for="image">Choose an image</label>
+          <input id="image" type="file" accept="image/png,image/jpeg,image/webp">
+          <button class="text-button" id="sample">Try Japanese demo ↗</button>
+        </div>
+
+        <div id="preview" hidden>
+          <div class="canvas-wrap" id="canvas-wrap">
+            <div class="canvas-stage" id="canvas-stage">
+              <canvas id="canvas" aria-label="Selected image preview"></canvas>
+              <div id="ocr-layer" class="ocr-layer" aria-label="Selectable OCR text overlay"></div>
+            </div>
+          </div>
+          <div class="image-controls">
+            <label class="text-button" for="image">Change image</label>
+            <button class="text-button" id="crop">Draw scan area</button>
+            <button class="text-button" id="reset" hidden>Use full screen</button>
+          </div>
+          <p class="hint" id="image-hint">Scan the full screen, or draw around one bubble for better accuracy.</p>
+        </div>
+
+        <div class="scan-controls">
+          <label for="language">Text direction
+            <select id="language">
+              <option value="jpn">Japanese · horizontal</option>
+              <option value="jpn_vert">Japanese · vertical manga</option>
+              <option value="eng">English</option>
+            </select>
+          </label>
+          <button class="button primary" id="scan" disabled>Scan text <span aria-hidden="true">↗</span></button>
+          <button class="text-button" id="cancel" hidden>Cancel scan</button>
+        </div>
+
+        <div class="reader-tools" id="reader-tools" hidden>
+          <span class="tool-label">Tap mode</span>
+          <button class="mode-button active" id="single-mode" aria-pressed="true">One word</button>
+          <button class="mode-button" id="multi-mode" aria-pressed="false">Multiple</button>
+          <button class="mode-button" id="clear-selection">Clear</button>
+          <button class="mode-button" id="toggle-overlay" aria-pressed="true">Overlay on</button>
+        </div>
+
+        <div class="status-wrap">
+          <p id="status" role="status" aria-live="polite">Choose an image to get started.</p>
+          <progress id="progress" value="0" max="1" hidden aria-label="OCR progress"></progress>
+        </div>
+      </section>
+
+      <section class="card result-card">
+        <div class="card-heading"><span class="step">02</span><h2>OCR transcript</h2><span class="small" id="count">0 characters</span></div>
+        <div class="reader-help" id="reader-help">
+          <strong>How the reader works</strong>
+          <ol>
+            <li>Scan the full screenshot or draw around a speech bubble.</li>
+            <li>Tap the green OCR text directly over the image.</li>
+            <li>Choose <b>Multiple</b> to combine several words.</li>
+          </ol>
+        </div>
+        <label for="result" class="sr-only">Recognized text</label>
+        <textarea id="result" placeholder="Recognized Japanese text appears here. You can correct OCR mistakes; scan again to rebuild the positioned overlay." spellcheck="false"></textarea>
+        <div class="result-footer">
+          <span class="hint">The overlay remains real selectable text, so desktop Yomitan can also scan it.</span>
+          <div class="actions"><button class="button secondary" id="save" disabled>Save .txt</button><button class="button dark" id="copy" disabled>Copy text</button></div>
+        </div>
+      </section>
+    </div>
+
+    <footer><span><i></i> OCR stays on this device.</span><span>LegibleLens / Japanese → Mongolian</span></footer>
+    <p class="note">The included dictionary is a small offline starter dictionary. The online translation button opens Google Translate only when you press it. Manga OCR accuracy will improve when the trained manga model is added.</p>
+  </main>
+
+  <aside id="lookup-popup" class="lookup-popup" hidden role="dialog" aria-labelledby="lookup-title">
+    <div class="popup-grip" aria-hidden="true"></div>
+    <button id="close-popup" class="popup-close" aria-label="Close popup">×</button>
+    <p class="popup-label">SELECTED JAPANESE</p>
+    <h2 id="lookup-title">—</h2>
+    <p id="lookup-reading" class="reading"></p>
+    <div class="meaning-box"><span>MONGOLIAN</span><p id="lookup-meaning"></p></div>
+    <p id="lookup-note" class="lookup-note"></p>
+    <div class="popup-actions">
+      <button class="button secondary" id="copy-selection">Copy</button>
+      <a class="button dark" id="online-translate" href="#" target="_blank" rel="noreferrer">Translate online ↗</a>
+    </div>
+    <p class="privacy-note">Online translation sends only the selected text to Google Translate.</p>
+  </aside>
+</body>
+</html>

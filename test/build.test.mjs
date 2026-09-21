@@ -13,16 +13,31 @@ test('build creates standalone web OCR assets', async () => {
     'dist/web/vendor/tesseract.min.js',
     'dist/web/vendor/worker.min.js',
     'dist/web/ocr/eng.traineddata.gz',
-    'dist/web/ocr/jpn.traineddata.gz'
+    'dist/web/ocr/jpn.traineddata.gz',
+    'dist/web/ocr/jpn_vert.traineddata.gz',
+    'dist/web/dictionary.js'
   ]) await access(path.join(root, file));
 });
 
-test('extension is Manifest V3 and opens the shared app', async () => {
+test('extension is Manifest V3 and captures the visible tab', async () => {
   const manifest = JSON.parse(await readFile(path.join(root, 'dist/extension/manifest.json'), 'utf8'));
   assert.equal(manifest.manifest_version, 3);
   assert.equal(manifest.background.service_worker, 'background.js');
   assert.equal(manifest.host_permissions, undefined);
-  assert.match(await readFile(path.join(root, 'dist/extension/background.js'), 'utf8'), /index\.html/);
+  assert.ok(manifest.permissions.includes('activeTab'));
+  assert.ok(manifest.permissions.includes('storage'));
+  const background = await readFile(path.join(root, 'dist/extension/background.js'), 'utf8');
+  assert.match(background, /captureVisibleTab/);
+  assert.match(background, /index\.html\?capture=1/);
+});
+
+test('shared app contains positioned OCR lookup and Mongolian dictionary UI', async () => {
+  const app = await readFile(path.join(root, 'dist/web/app.js'), 'utf8');
+  const html = await readFile(path.join(root, 'dist/web/index.html'), 'utf8');
+  assert.match(app, /blocks: true/);
+  assert.match(app, /Intl\.Segmenter/);
+  assert.match(html, /lookup-popup/);
+  assert.match(html, /Japanese → Mongolian/);
 });
 
 test('server routes only to generated web files', () => {
