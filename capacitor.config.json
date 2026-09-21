@@ -1,0 +1,8 @@
+{
+  "appId": "mn.legiblelens.app",
+  "appName": "LegibleLens",
+  "webDir": "dist/web",
+  "server": {
+    "androidScheme": "https"
+  }
+}

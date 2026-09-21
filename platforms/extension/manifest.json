@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "LegibleLens",
+  "version": "0.1.0",
+  "description": "Japanese manga OCR and Mongolian translation companion.",
+  "action": {
+    "default_title": "Open LegibleLens"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  }
+}

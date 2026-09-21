@@ -1,0 +1,56 @@
+name: Build LegibleLens artifacts
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  web-and-extension:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install pnpm
+        run: npm install --global pnpm@11.19.0
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build web and Opera GX extension
+        run: pnpm test
+      - name: Package extension
+        run: cd dist/extension && zip -r ../legiblelens-opera-extension.zip .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: legiblelens-opera-extension
+          path: dist/legiblelens-opera-extension.zip
+
+  android-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Install pnpm
+        run: npm install --global pnpm@11.19.0
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build and sync Android app
+        run: pnpm android:sync
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: legiblelens-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">LegibleLens</string>
+    <string name="title_activity_main">LegibleLens</string>
+    <string name="package_name">mn.legiblelens.app</string>
+    <string name="custom_url_scheme">mn.legiblelens.app</string>
+</resources>
